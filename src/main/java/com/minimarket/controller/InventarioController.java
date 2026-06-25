@@ -4,6 +4,7 @@ import com.minimarket.entity.Inventario;
 import com.minimarket.service.InventarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class InventarioController {
 
     private final InventarioService inventarioService;
 
+    // Los GET pueden ser consultados para ver el stock
     @GetMapping
     public List<Inventario> listarMovimientosDeInventario() {
         return inventarioService.findAll();
@@ -26,12 +28,16 @@ public class InventarioController {
         return (inventario != null) ? ResponseEntity.ok(inventario) : ResponseEntity.notFound().build();
     }
 
+    // Candado: Solo Administradores pueden registrar entradas o salidas
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Inventario registrarMovimiento(@RequestBody Inventario inventario) {
         return inventarioService.save(inventario);
     }
 
+    // Candado: Solo Administradores pueden modificar un registro de inventario
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Inventario> actualizarMovimiento(@PathVariable Long id, @RequestBody Inventario inventario) {
         Inventario existente = inventarioService.findById(id);
         if (existente != null) {
@@ -41,7 +47,9 @@ public class InventarioController {
         return ResponseEntity.notFound().build();
     }
 
+    // Candado: Solo Administradores pueden eliminar movimientos
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminarMovimiento(@PathVariable Long id) {
         Inventario inventario = inventarioService.findById(id);
         if (inventario != null) {

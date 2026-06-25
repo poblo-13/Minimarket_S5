@@ -1,7 +1,11 @@
 package com.minimarket.entity;
 
 import jakarta.persistence.*;
-import java.util.Date;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 
 @Entity
 public class Inventario {
@@ -11,16 +15,22 @@ public class Inventario {
 
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
+    @NotNull(message = "El producto no puede ser nulo")
     private Producto producto;
 
     @Column(nullable = false)
+    @NotNull(message = "La cantidad es obligatoria")
+    @Min(value = 1, message = "La cantidad debe ser al menos 1")
     private Integer cantidad;
 
     @Column(nullable = false)
-    private String tipoMovimiento; // Ejemplo: "Entrada" o "Salida"
+    @NotBlank(message = "El tipo de movimiento no puede estar en blanco")
+    @Pattern(regexp = "^(Entrada|Salida)$", message = "El tipo de movimiento debe ser exactamente 'Entrada' o 'Salida'")
+    private String tipoMovimiento; 
 
     @Column(nullable = false)
-    private Date fechaMovimiento;
+    @NotNull(message = "La fecha de movimiento es obligatoria")
+    private LocalDateTime fechaMovimiento;
 
     // Getters y Setters
     public Long getId() {
@@ -55,11 +65,11 @@ public class Inventario {
         this.tipoMovimiento = tipoMovimiento;
     }
 
-    public Date getFechaMovimiento() {
+    public LocalDateTime getFechaMovimiento() {
         return fechaMovimiento;
     }
 
-    public void setFechaMovimiento(Date fechaMovimiento) {
+    public void setFechaMovimiento(LocalDateTime fechaMovimiento) {
         this.fechaMovimiento = fechaMovimiento;
     }
 }
